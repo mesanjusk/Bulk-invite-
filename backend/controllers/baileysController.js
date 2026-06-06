@@ -150,10 +150,11 @@ async function getLogs(req, res) {
 async function sendInvitation(req, res) {
   const {
     imageUrl,
-    eventName,
-    date,
-    time,
-    venue,
+    message    = '',
+    eventName  = '',
+    date       = '',
+    time       = '',
+    venue      = '',
     textPosition = 'bottom',
     recipients = [],
     includeRsvp = false,
@@ -161,23 +162,19 @@ async function sendInvitation(req, res) {
     rsvpNoLabel  = 'Sorry, can\'t make it ❌',
   } = req.body;
 
-  const missingFields = [];
-  if (!imageUrl)       missingFields.push('imageUrl');
-  if (!eventName)      missingFields.push('eventName');
-  if (!date)           missingFields.push('date');
-  if (!time)           missingFields.push('time');
-  if (!venue)          missingFields.push('venue');
-  if (!recipients.length) missingFields.push('recipients');
-
-  if (missingFields.length) {
-    return res.status(400).json({ message: 'Missing required fields', missingFields });
-  }
+  if (!imageUrl)          return res.status(400).json({ message: 'imageUrl is required' });
+  if (!recipients.length) return res.status(400).json({ message: 'At least one recipient is required' });
 
   let success = 0;
   let failed  = 0;
   const errors = [];
 
-  const caption = `🎉 *${eventName}*\n📅 ${date}  🕐 ${time}\n📍 ${venue}`;
+  // Use custom message if provided, otherwise auto-build from event details
+  const captionParts = [];
+  if (eventName) captionParts.push(`🎉 *${eventName}*`);
+  if (date || time) captionParts.push(`📅 ${date}  🕐 ${time}`.trim());
+  if (venue) captionParts.push(`📍 ${venue}`);
+  const caption = message.trim() || captionParts.join('\n');
 
   for (const recipient of recipients) {
     const phone = normalizePhone(recipient.mobile || recipient.phone || '');

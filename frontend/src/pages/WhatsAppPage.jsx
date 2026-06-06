@@ -50,6 +50,7 @@ const baileysTabs = [
 const emptyInvitationForm = {
   recipientMode: 'single', singleName: '', singleNumber: '',
   imageUrl: '', eventName: '', date: '', time: '', venue: '',
+  message: '',
   includeRsvp: false, rsvpYesLabel: 'Yes, I\'ll attend ✅', rsvpNoLabel: 'Sorry, can\'t make it ❌',
 };
 
@@ -67,14 +68,9 @@ const emptyFontStyle = {
 };
 
 const recipientModeOptions = [
-  { value: 'students',    label: 'Students'     },
-  { value: 'parents',     label: 'Parents'      },
-  { value: 'teamMembers', label: 'Team Members' },
-  { value: 'volunteers',  label: 'Volunteers'   },
-  { value: 'guests',      label: 'Guests'       },
-  { value: 'single',      label: 'Single Number'},
-  { value: 'csv',         label: 'CSV File'     },
-  { value: 'excel',       label: 'Excel File'   },
+  { value: 'single', label: 'Single Number' },
+  { value: 'csv',    label: 'CSV File'      },
+  { value: 'excel',  label: 'Excel File'    },
 ];
 
 const emptyRule = {
@@ -745,6 +741,12 @@ function InvitationPanel({
             <Grid size={{ xs: 12 }}>
               <TextField fullWidth label="Venue" value={invitationForm.venue}
                 onChange={e => setInvitationForm(p => ({ ...p, venue: e.target.value }))} />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <TextField fullWidth label="Message / Caption" multiline minRows={2}
+                value={invitationForm.message}
+                onChange={e => setInvitationForm(p => ({ ...p, message: e.target.value }))}
+                helperText="Custom text sent with the image. Overrides the auto-generated event caption." />
             </Grid>
             <Grid size={{ xs: 12 }}>
               <FormControlLabel

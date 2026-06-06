@@ -20,9 +20,9 @@ function generateBootstrapToken(username) {
 }
 
 function canUseBootstrapLogin() {
-  if (process.env.BOOTSTRAP_LOGIN_ENABLED === 'true') return true;
-  if (process.env.NODE_ENV !== 'production' && process.env.BOOTSTRAP_USERNAME && process.env.BOOTSTRAP_PASSWORD) return true;
-  return false;
+  // Works whenever BOOTSTRAP_USERNAME + PASSWORD are explicitly set in env —
+  // including production. Setting these vars is itself the opt-in signal.
+  return !!(process.env.BOOTSTRAP_USERNAME && process.env.BOOTSTRAP_PASSWORD);
 }
 
 async function login(req, res) {

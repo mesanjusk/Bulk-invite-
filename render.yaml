@@ -8,3 +8,55 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 5000
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ACCESS_TOKEN_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://bulk-invite-frontend.vercel.app
+      - key: CLIENT_URL
+        value: https://bulk-invite-frontend.vercel.app
+      - key: BOOTSTRAP_USERNAME
+        sync: false
+      - key: BOOTSTRAP_PASSWORD
+        sync: false
+      - key: SUPER_ADMIN_USERNAME
+        sync: false
+      - key: SUPER_ADMIN_PASSWORD
+        sync: false
+      - key: SUPER_ADMIN_MOBILE
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: META_APP_ID
+        sync: false
+      - key: META_APP_SECRET
+        sync: false
+      - key: META_API_VERSION
+        value: v18.0
+      - key: WHATSAPP_API_VERSION
+        value: v18.0
+      - key: WHATSAPP_WEBHOOK_VERIFY_TOKEN
+        sync: false
+      - key: WHATSAPP_ENFORCE_WEBHOOK_SIGNATURE
+        value: "false"
+      - key: WHATSAPP_TOKEN_ENCRYPTION_KEY
+        sync: false
+      - key: WHATSAPP_ACCESS_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_WABA_ID
+        sync: false
+      - key: WHATSAPP_APP_SECRET
+        sync: false
+      - key: WHATSAPP_BUSINESS_ACCOUNT_ID
+        sync: false

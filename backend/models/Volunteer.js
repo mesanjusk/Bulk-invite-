@@ -13,7 +13,8 @@ const volunteerSchema = new mongoose.Schema(
     photoUrl: { type: String, default: '' },
     remarks: { type: String, default: '' },
     source: { type: String, default: 'PUBLIC_FORM' },
-    whatsappConfirmationSentAt: { type: Date, default: null }
+    whatsappConfirmationSentAt: { type: Date, default: null },
+    tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
   },
   { timestamps: true }
 );

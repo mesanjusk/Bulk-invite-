@@ -9,6 +9,7 @@ const notificationSchema = new mongoose.Schema({
   readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   relatedModel: { type: String, default: '' },
   relatedId: { type: String, default: '' }
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Notification', notificationSchema);

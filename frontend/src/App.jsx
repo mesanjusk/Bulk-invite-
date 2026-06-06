@@ -9,6 +9,8 @@ import theme from './theme';
 import { MODULE_PERMISSIONS } from './utils/accessControl';
 
 import LoginPage from './pages/LoginPage';
+import SignupPage from './pages/SignupPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import DashboardPage from './pages/DashboardPage';
 import StudentsPage from './pages/StudentsPage';
 import CategoriesPage from './pages/CategoriesPage';
@@ -28,7 +30,6 @@ import PublicPhotoTemplatePage from './pages/PublicPhotoTemplatePage';
 import TemplateConfigPage from './pages/TemplateConfigPage';
 import PublicInvitationPage from './pages/PublicInvitationPage';
 
-// Set to true to open registrations, false to show the "Registration Closed" page
 const STUDENT_REGISTRATION_OPEN = false;
 const ANCHOR_REGISTRATION_OPEN = false;
 
@@ -48,7 +49,7 @@ const protectedPages = [
   ['/admin',                <AdminPage />,              MODULE_PERMISSIONS.admin],
   ['/whatsapp',             <WhatsAppPage />,           MODULE_PERMISSIONS.whatsapp],
   ['/super-admin/settings', <SuperAdminSettingsPage />, MODULE_PERMISSIONS.superAdminSettings],
-  ['/template-config',      <TemplateConfigPage />,      MODULE_PERMISSIONS.templateConfig],
+  ['/template-config',      <TemplateConfigPage />,     MODULE_PERMISSIONS.templateConfig],
 ];
 
 export default function App() {
@@ -59,14 +60,21 @@ export default function App() {
         <LiveProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/student-register" element={STUDENT_REGISTRATION_OPEN ? <PublicStudentFormPage /> : <RegistrationClosedPage title="BK Awards – Scholar Registration" color="#2497d3" />} />
+              {/* Public auth pages */}
+              <Route path="/login"           element={<LoginPage />} />
+              <Route path="/signup"          element={<SignupPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+
+              {/* Public form pages */}
+              <Route path="/student-register"    element={STUDENT_REGISTRATION_OPEN ? <PublicStudentFormPage /> : <RegistrationClosedPage title="Scholar Registration" color="#2497d3" />} />
               <Route path="/student-edit/:token" element={<PublicStudentFormPage />} />
-              <Route path="/volunteer-register" element={<PublicVolunteerFormPage />} />
-              <Route path="/anchor-register" element={ANCHOR_REGISTRATION_OPEN ? <PublicAnchorFormPage /> : <RegistrationClosedPage />} />
-              <Route path="/anchor-edit/:token" element={<PublicAnchorFormPage />} />
-              <Route path="/photo-template" element={<PublicPhotoTemplatePage />} />
-              <Route path="/public-invite" element={<PublicInvitationPage />} />
+              <Route path="/volunteer-register"  element={<PublicVolunteerFormPage />} />
+              <Route path="/anchor-register"     element={ANCHOR_REGISTRATION_OPEN ? <PublicAnchorFormPage /> : <RegistrationClosedPage />} />
+              <Route path="/anchor-edit/:token"  element={<PublicAnchorFormPage />} />
+              <Route path="/photo-template"      element={<PublicPhotoTemplatePage />} />
+              <Route path="/public-invite"       element={<PublicInvitationPage />} />
+
+              {/* Protected pages */}
               {protectedPages.map(([path, page, permission]) => (
                 <Route
                   key={path}

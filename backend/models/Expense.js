@@ -11,6 +11,7 @@ const expenseSchema = new mongoose.Schema({
   approvedByUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   status: { type: String, enum: ['PENDING','APPROVED','PAID'], default: 'PAID' },
   note: { type: String, default: '' }
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Expense', expenseSchema);

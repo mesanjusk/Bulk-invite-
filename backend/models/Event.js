@@ -8,6 +8,7 @@ const eventSchema = new mongoose.Schema({
   mode: { type: String, enum: ['PLANNING', 'LIVE'], default: 'PLANNING' },
   description: { type: String, default: '' },
   isActive: { type: Boolean, default: true }
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Event', eventSchema);

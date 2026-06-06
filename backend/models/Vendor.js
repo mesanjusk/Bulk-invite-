@@ -16,6 +16,7 @@ const vendorSchema = new mongoose.Schema({
   dueAmount: { type: Number, default: 0 },
   paymentStatus: { type: String, enum: ['UNPAID','PARTIAL','PAID'], default: 'UNPAID' },
   notes: { type: String, default: '' }
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Vendor', vendorSchema);

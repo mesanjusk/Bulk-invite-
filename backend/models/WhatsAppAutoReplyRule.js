@@ -10,6 +10,7 @@ const schema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   priority: { type: Number, default: 100 },
   stopAfterMatch: { type: Boolean, default: true }
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 schema.index({ isActive: 1, priority: 1, createdAt: -1 });
 module.exports = mongoose.model('WhatsAppAutoReplyRule', schema);

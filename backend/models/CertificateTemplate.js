@@ -11,6 +11,7 @@ const certificateTemplateSchema = new mongoose.Schema({
     height: { type: Number, default: 160 }
   },
   isActive: { type: Boolean, default: true }
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('CertificateTemplate', certificateTemplateSchema);

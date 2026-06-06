@@ -26,6 +26,7 @@ const BaileysAutoReplyRuleSchema = new mongoose.Schema(
     isActive: { type: Boolean, default: true },
     priority: { type: Number, default: 100 }, // lower = evaluated first
     stopAfterMatch: { type: Boolean, default: true },
+    tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
   },
   { timestamps: true }
 );

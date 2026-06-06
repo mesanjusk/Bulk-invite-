@@ -6,12 +6,11 @@ const dotenv = require('dotenv');
 const { Server } = require('socket.io');
 const connectDB = require('./config/db');
 const { setIO } = require('./services/socket');
-const seedAdmin = require("./seedAdmin");
+const seedAdmin = require('./seedAdmin');
 
 dotenv.config();
 
-// Prevent Baileys internal errors (e.g. sendRetryRequest on a closed socket)
-// from crashing the whole Node process.
+// Prevent Baileys internal errors from crashing the Node process
 process.on('unhandledRejection', (reason) => {
   const msg = reason?.message || String(reason);
   if (msg.includes('Connection Closed') || msg.includes('Timed Out') || msg.includes('baileys')) {
@@ -37,27 +36,29 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
   'https://bkfrontend.vercel.app',
-  'https://bkawards.instify.in'
+  'https://bkawards.instify.in',
+  // Add your Vercel frontend URL via env var
+  ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error('Not allowed by CORS'));
-    },
-    credentials: true
-  })
-);
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+}));
 
 app.use(compression());
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
-app.get('/', (req, res) => res.send('Scholar Awards Event Backend running'));
+app.get('/', (req, res) => res.send('Bulk Invite Backend running'));
 
+// ── Routes ────────────────────────────────────────────────────────────────────
 app.use('/api/auth',                require('./routes/authRoutes'));
+app.use('/api/org',                 require('./routes/orgRoutes'));
 app.use('/api/dashboard',           require('./routes/dashboardRoutes'));
 app.use('/api/roles',               require('./routes/crudRoutes')(require('./models/Role')));
 app.use('/api/users',               require('./routes/userRoutes'));
@@ -81,7 +82,6 @@ app.use('/api/volunteers',          require('./routes/volunteerRoutes'));
 app.use('/api/system-settings',     require('./routes/systemSettingsRoutes'));
 app.use('/api/anchors',             require('./routes/anchors.routes'));
 
-
 async function startServer() {
   try {
     await connectDB();
@@ -93,8 +93,8 @@ async function startServer() {
       cors: {
         origin: allowedOrigins,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-        credentials: true
-      }
+        credentials: true,
+      },
     });
 
     setIO(io);
@@ -109,16 +109,12 @@ async function startServer() {
     server.listen(PORT, () => {
       console.log(`Server running on ${PORT}`);
 
-      // ── Baileys auto-connect ──────────────────────────────────────────────
-      // If saved WhatsApp credentials exist in MongoDB, reconnect automatically
-      // on every server boot — no manual QR scan needed after a restart.
+      // Auto-reconnect Baileys if saved credentials exist in MongoDB
       const { autoConnectIfCredentialsExist } = require('./services/baileysService');
       autoConnectIfCredentialsExist().catch((err) =>
         console.error('[baileys] Auto-connect failed on boot:', err.message)
       );
-      // ─────────────────────────────────────────────────────────────────────
     });
-
   } catch (err) {
     console.error('Failed to start server:', err.message);
     process.exit(1);

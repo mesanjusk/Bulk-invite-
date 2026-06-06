@@ -8,6 +8,7 @@ const schema = new mongoose.Schema({
   wabaId: { type: String, default: '' },
   accessTokenMasked: { type: String, default: '' },
   isActive: { type: Boolean, default: true }
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('WhatsAppConnection', schema);

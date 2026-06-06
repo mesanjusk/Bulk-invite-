@@ -52,6 +52,7 @@ const categorySchema = new mongoose.Schema(
     sequencePriority: { type: Number, default: 0 },
     notes: { type: String, default: '' },
     isActive: { type: Boolean, default: true },
+    tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
   },
   { timestamps: true }
 );

@@ -23,10 +23,17 @@ export function AuthProvider({ children }) {
     init();
   }, []);
 
+  // Login with credentials (for login page)
   const login = async (username, password) => {
     const { data } = await api.post('/auth/login', { username, password });
     localStorage.setItem('token', data.token);
     setUser(data.user);
+  };
+
+  // Login with token + user (for signup/forgot-password pages)
+  const loginWithToken = (token, userData) => {
+    localStorage.setItem('token', token);
+    setUser(userData);
   };
 
   const logout = () => {
@@ -34,7 +41,11 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
-  const value = useMemo(() => ({ user, loading, login, logout }), [user, loading]);
+  const value = useMemo(
+    () => ({ user, loading, login, loginWithToken, logout }),
+    [user, loading]
+  );
+
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

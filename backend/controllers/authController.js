@@ -5,14 +5,10 @@ function getJwtSecret() {
   return process.env.JWT_SECRET || process.env.ACCESS_TOKEN_SECRET || 'change-me-in-env';
 }
 
-function canUseBootstrapLogin() {
-  if (process.env.BOOTSTRAP_LOGIN_ENABLED === 'true') return true;
-  if (process.env.NODE_ENV !== 'production' && process.env.BOOTSTRAP_USERNAME && process.env.BOOTSTRAP_PASSWORD) return true;
-  return false;
-}
-
 function generateDbToken(id) {
-  return jwt.sign({ id, type: 'db-user' }, getJwtSecret(), { expiresIn: process.env.JWT_EXPIRES_IN || '30d' });
+  return jwt.sign({ id, type: 'db-user' }, getJwtSecret(), {
+    expiresIn: process.env.JWT_EXPIRES_IN || '30d',
+  });
 }
 
 function generateBootstrapToken(username) {
@@ -23,23 +19,31 @@ function generateBootstrapToken(username) {
   );
 }
 
+function canUseBootstrapLogin() {
+  if (process.env.BOOTSTRAP_LOGIN_ENABLED === 'true') return true;
+  if (process.env.NODE_ENV !== 'production' && process.env.BOOTSTRAP_USERNAME && process.env.BOOTSTRAP_PASSWORD) return true;
+  return false;
+}
+
 async function login(req, res) {
   try {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ message: 'Username and password are required' });
+    const { username, password, mobile } = req.body;
+    const identifier = (mobile || username || '').trim();
+
+    if (!identifier || !password) {
+      return res.status(400).json({ message: 'Mobile/username and password are required' });
     }
 
-    const bootstrapUsername = process.env.BOOTSTRAP_USERNAME;
-    const bootstrapPassword = process.env.BOOTSTRAP_PASSWORD;
-
-    if (canUseBootstrapLogin() && bootstrapUsername && bootstrapPassword && username === bootstrapUsername && password === bootstrapPassword) {
+    // Bootstrap (hardcoded) super admin
+    const bsUser = process.env.BOOTSTRAP_USERNAME;
+    const bsPass = process.env.BOOTSTRAP_PASSWORD;
+    if (canUseBootstrapLogin() && bsUser && bsPass && identifier === bsUser && password === bsPass) {
       return res.json({
-        token: generateBootstrapToken(bootstrapUsername),
+        token: generateBootstrapToken(bsUser),
         user: {
           _id: 'hardcoded-super-admin',
           name: process.env.BOOTSTRAP_NAME || 'Super Admin',
-          username: bootstrapUsername,
+          username: bsUser,
           mobile: '',
           email: '',
           isActive: true,
@@ -47,17 +51,21 @@ async function login(req, res) {
           eventDutyType: 'SUPER_ADMIN',
           availabilityStatus: 'AVAILABLE',
           stageCounts: { anchorCalls: 0, guestAwards: 0, volunteerAssignments: 0, teamAssignments: 0 },
-          roleId: { _id: 'hardcoded-role-super-admin', name: 'Super Admin', code: 'SUPER_ADMIN', permissions: ['*'] }
-        }
+          roleId: { _id: 'hardcoded-role-super-admin', name: 'Super Admin', code: 'SUPER_ADMIN', permissions: ['*'] },
+        },
       });
     }
 
-    const user = await User.findOne({ username }).populate('roleId');
-    if (!user) return res.status(401).json({ message: 'Invalid username or password' });
-    if (!user.isActive) return res.status(403).json({ message: 'User account is inactive' });
+    // DB lookup — support login by mobile OR username
+    const user = await User.findOne({
+      $or: [{ mobile: identifier }, { username: identifier }],
+    }).populate('roleId');
+
+    if (!user) return res.status(401).json({ message: 'Invalid credentials' });
+    if (!user.isActive) return res.status(403).json({ message: 'Account is inactive' });
 
     const ok = await user.matchPassword(password);
-    if (!ok) return res.status(401).json({ message: 'Invalid username or password' });
+    if (!ok) return res.status(401).json({ message: 'Invalid credentials' });
 
     return res.json({ token: generateDbToken(user._id), user });
   } catch (error) {

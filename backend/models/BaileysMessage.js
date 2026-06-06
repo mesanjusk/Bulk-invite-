@@ -14,6 +14,7 @@ const schema = new mongoose.Schema({
   mediaUrl: { type: String, default: '' },
   status: { type: String, enum: ['PENDING', 'QUEUED', 'SENT', 'DELIVERED', 'READ', 'FAILED', 'RECEIVED'], default: 'SENT', index: true },
   meta: { type: mongoose.Schema.Types.Mixed, default: {} }
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 
 schema.index({ conversationKey: 1, createdAt: -1 });

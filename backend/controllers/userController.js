@@ -2,15 +2,15 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Role = require('../models/Role');
 
+function tenantFilter(req) {
+  return req.tenantId ? { tenantId: req.tenantId } : {};
+}
+
 async function getUsers(req, res) {
   try {
-    const filter = {};
-    if (req.query.eventDutyType) {
-      filter.eventDutyType = req.query.eventDutyType;
-    }
-    if (req.query.isActive !== undefined) {
-      filter.isActive = String(req.query.isActive) === 'true';
-    }
+    const filter = { ...tenantFilter(req) };
+    if (req.query.eventDutyType) filter.eventDutyType = req.query.eventDutyType;
+    if (req.query.isActive !== undefined) filter.isActive = String(req.query.isActive) === 'true';
 
     const users = await User.find(filter).populate('roleId').sort({ createdAt: -1 });
     res.json(users);
@@ -21,7 +21,10 @@ async function getUsers(req, res) {
 
 async function createUser(req, res) {
   try {
-    const user = await User.create(req.body);
+    const payload = { ...req.body };
+    if (req.tenantId) payload.tenantId = req.tenantId;
+
+    const user = await User.create(payload);
     const populated = await User.findById(user._id).populate('roleId');
     res.status(201).json(populated);
   } catch (error) {
@@ -38,15 +41,13 @@ async function updateUser(req, res) {
       delete payload.password;
     }
 
-    const updated = await User.findByIdAndUpdate(req.params.id, payload, {
-      new: true,
-      runValidators: true,
-    }).populate('roleId');
+    const updated = await User.findOneAndUpdate(
+      { _id: req.params.id, ...tenantFilter(req) },
+      payload,
+      { new: true, runValidators: true }
+    ).populate('roleId');
 
-    if (!updated) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
+    if (!updated) return res.status(404).json({ message: 'User not found' });
     res.json(updated);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -56,63 +57,44 @@ async function updateUser(req, res) {
 async function bulkImportGuests(req, res) {
   try {
     const rows = Array.isArray(req.body.rows) ? req.body.rows : [];
-    if (!rows.length) {
-      return res.status(200).json({ message: 'No rows provided', created: [], errors: [] });
-    }
+    if (!rows.length) return res.status(200).json({ message: 'No rows provided', created: [], errors: [] });
 
     let roleId = req.body.roleId || null;
     const roleCode = String(req.body.roleCode || '').trim().toUpperCase();
 
     if (!roleId && roleCode) {
-      const role = await Role.findOne({ code: roleCode });
+      const role = await Role.findOne({ code: roleCode, ...tenantFilter(req) });
       roleId = role?._id || null;
     }
-
-    if (!roleId) {
-      return res.status(400).json({ message: 'A valid role must be selected before importing.' });
-    }
+    if (!roleId) return res.status(400).json({ message: 'A valid role must be selected before importing.' });
 
     const created = [];
     const errors = [];
 
-    for (let index = 0; index < rows.length; index += 1) {
-      const row = rows[index] || {};
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i] || {};
       try {
         const name = String(row.name || row.fullName || '').trim();
         const username = String(row.username || '').trim();
         const password = String(row.password || '').trim() || 'guest123';
-
-        if (!name || !username) {
-          throw new Error('Name and username are required');
-        }
+        if (!name || !username) throw new Error('Name and username are required');
 
         const doc = await User.create({
-          name,
-          username,
-          password,
+          name, username, password,
           mobile: String(row.mobile || '').trim(),
           email: String(row.email || '').trim(),
           roleId: row.roleId || roleId,
           eventDutyType: 'GUEST',
+          tenantId: req.tenantId || null,
           isActive: row.isActive !== undefined ? Boolean(row.isActive) : true,
         });
-
-        const populated = await User.findById(doc._id).populate('roleId');
-        created.push(populated);
+        created.push(await User.findById(doc._id).populate('roleId'));
       } catch (error) {
-        errors.push({
-          row: index + 2,
-          username: row.username || '',
-          message: error.message,
-        });
+        errors.push({ row: i + 2, username: row.username || '', message: error.message });
       }
     }
 
-    res.status(201).json({
-      message: `Imported ${created.length} guest(s)`,
-      created,
-      errors,
-    });
+    res.status(201).json({ message: `Imported ${created.length} guest(s)`, created, errors });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -121,63 +103,44 @@ async function bulkImportGuests(req, res) {
 async function bulkImportVolunteers(req, res) {
   try {
     const rows = Array.isArray(req.body.rows) ? req.body.rows : [];
-    if (!rows.length) {
-      return res.status(200).json({ message: 'No rows provided', created: [], errors: [] });
-    }
+    if (!rows.length) return res.status(200).json({ message: 'No rows provided', created: [], errors: [] });
 
     let roleId = req.body.roleId || null;
     const roleCode = String(req.body.roleCode || '').trim().toUpperCase();
 
     if (!roleId && roleCode) {
-      const role = await Role.findOne({ code: roleCode });
+      const role = await Role.findOne({ code: roleCode, ...tenantFilter(req) });
       roleId = role?._id || null;
     }
-
-    if (!roleId) {
-      return res.status(400).json({ message: 'A valid role must be selected before importing.' });
-    }
+    if (!roleId) return res.status(400).json({ message: 'A valid role must be selected before importing.' });
 
     const created = [];
     const errors = [];
 
-    for (let index = 0; index < rows.length; index += 1) {
-      const row = rows[index] || {};
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i] || {};
       try {
         const name = String(row.name || row.fullName || '').trim();
         const username = String(row.username || '').trim();
         const password = String(row.password || '').trim() || 'volunteer123';
-
-        if (!name || !username) {
-          throw new Error('Name and username are required');
-        }
+        if (!name || !username) throw new Error('Name and username are required');
 
         const doc = await User.create({
-          name,
-          username,
-          password,
+          name, username, password,
           mobile: String(row.mobile || '').trim(),
           email: String(row.email || '').trim(),
           roleId: row.roleId || roleId,
           eventDutyType: 'VOLUNTEER',
+          tenantId: req.tenantId || null,
           isActive: row.isActive !== undefined ? Boolean(row.isActive) : true,
         });
-
-        const populated = await User.findById(doc._id).populate('roleId');
-        created.push(populated);
+        created.push(await User.findById(doc._id).populate('roleId'));
       } catch (error) {
-        errors.push({
-          row: index + 2,
-          username: row.username || '',
-          message: error.message,
-        });
+        errors.push({ row: i + 2, username: row.username || '', message: error.message });
       }
     }
 
-    res.status(201).json({
-      message: `Imported ${created.length} volunteer(s)`,
-      created,
-      errors,
-    });
+    res.status(201).json({ message: `Imported ${created.length} volunteer(s)`, created, errors });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

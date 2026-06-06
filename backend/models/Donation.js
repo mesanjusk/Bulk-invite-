@@ -7,6 +7,7 @@ const donationSchema = new mongoose.Schema({
   note: { type: String, default: '' },
   receivedByUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   thankYouStatus: { type: String, enum: ['PENDING','SENT','FAILED'], default: 'PENDING' }
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Donation', donationSchema);

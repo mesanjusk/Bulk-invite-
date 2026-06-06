@@ -11,6 +11,7 @@ const eventTaskSchema = new mongoose.Schema({
   startTimeLabel: { type: String, default: '' },
   deadlineLabel: { type: String, default: '' },
   notes: { type: String, default: '' }
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('EventTask', eventTaskSchema);

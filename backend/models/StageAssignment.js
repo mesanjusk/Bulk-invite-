@@ -17,6 +17,7 @@ const stageAssignmentSchema = new mongoose.Schema({
   },
   changeReason: { type: String, default: '' },
   calledByAnchor: { type: Boolean, default: false }
+  tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model('StageAssignment', stageAssignmentSchema);

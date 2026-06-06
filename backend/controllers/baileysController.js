@@ -149,39 +149,38 @@ async function getLogs(req, res) {
 
 async function sendInvitation(req, res) {
   const {
-    imageUrl,
-    message    = '',
-    eventName  = '',
-    date       = '',
-    time       = '',
-    venue      = '',
+    imageUrl    = '',
+    message     = '',
     textPosition = 'bottom',
-    recipients = [],
+    recipients  = [],
     includeRsvp = false,
     rsvpYesLabel = 'Yes, I\'ll attend ✅',
     rsvpNoLabel  = 'Sorry, can\'t make it ❌',
   } = req.body;
 
-  if (!imageUrl)          return res.status(400).json({ message: 'imageUrl is required' });
   if (!recipients.length) return res.status(400).json({ message: 'At least one recipient is required' });
+
+  const caption = message.trim();
+  if (!imageUrl && !caption) {
+    return res.status(400).json({ message: 'Provide a message or upload an image (or both)' });
+  }
 
   let success = 0;
   let failed  = 0;
   const errors = [];
 
-  // Use custom message if provided, otherwise auto-build from event details
-  const captionParts = [];
-  if (eventName) captionParts.push(`🎉 *${eventName}*`);
-  if (date || time) captionParts.push(`📅 ${date}  🕐 ${time}`.trim());
-  if (venue) captionParts.push(`📍 ${venue}`);
-  const caption = message.trim() || captionParts.join('\n');
-
   for (const recipient of recipients) {
     const phone = normalizePhone(recipient.mobile || recipient.phone || '');
     if (!phone) { failed++; continue; }
 
+    const msgType = imageUrl ? 'IMAGE' : 'TEXT';
+
     try {
-      await baileysService.sendImage({ to: phone, imageUrl, caption });
+      if (imageUrl) {
+        await baileysService.sendImage({ to: phone, imageUrl, caption });
+      } else {
+        await baileysService.sendText({ to: phone, body: caption });
+      }
 
       await BaileysMessage.create({
         to: phone,
@@ -190,18 +189,19 @@ async function sendInvitation(req, res) {
         conversationKey: getConversationKey(phone),
         direction: 'OUTGOING',
         source: 'INVITATION',
-        messageType: 'IMAGE',
+        messageType: msgType,
         bodyText: caption,
         status: 'SENT',
-        meta: { eventName, date, time, venue, imageUrl, textPosition },
+        meta: { imageUrl, textPosition },
       });
 
       if (includeRsvp) {
+        const pollQuestion = caption ? `${caption.slice(0, 60)}${caption.length > 60 ? '…' : ''}` : 'Are you attending? 🎉';
         try {
           await baileysService.sendButtonMessage({
             to: phone,
-            text: `Will you be attending *${eventName}*? 🎉`,
-            footer: `${date}  •  ${venue}`,
+            text: pollQuestion,
+            footer: '',
             buttons: [
               { id: 'rsvp_yes', label: rsvpYesLabel },
               { id: 'rsvp_no',  label: rsvpNoLabel  },
@@ -220,7 +220,7 @@ async function sendInvitation(req, res) {
             meta: { rsvp: true, rsvpYesLabel, rsvpNoLabel },
           });
         } catch (rsvpErr) {
-          console.warn('[baileys] RSVP button send failed for', phone, rsvpErr.message);
+          console.warn('[baileys] RSVP poll send failed for', phone, rsvpErr.message);
         }
       }
 
@@ -235,7 +235,7 @@ async function sendInvitation(req, res) {
         conversationKey: getConversationKey(phone),
         direction: 'OUTGOING',
         source: 'INVITATION',
-        messageType: 'IMAGE',
+        messageType: msgType,
         bodyText: caption,
         status: 'FAILED',
         meta: { error: err.message },

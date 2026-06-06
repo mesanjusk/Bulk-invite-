@@ -49,7 +49,7 @@ const baileysTabs = [
 
 const emptyInvitationForm = {
   recipientMode: 'single', singleName: '', singleNumber: '',
-  imageUrl: '', eventName: '', date: '', time: '', venue: '',
+  imageUrl: '',
   message: '',
   includeRsvp: false, rsvpYesLabel: 'Yes, I\'ll attend ✅', rsvpNoLabel: 'Sorry, can\'t make it ❌',
 };
@@ -720,48 +720,30 @@ function InvitationPanel({
           </Typography>
         </CardContent></Card>
 
-        {/* ── Event details ── */}
+        {/* ── Message & RSVP ── */}
         <Card><CardContent>
-          <Typography fontWeight={700} sx={{ mb: 2 }}>Event Details</Typography>
+          <Typography fontWeight={700} sx={{ mb: 2 }}>Message</Typography>
           <Grid container spacing={2}>
-            <Grid size={{ xs: 12, md: 6 }}>
-              <TextField fullWidth label="Event Name" value={invitationForm.eventName}
-                onChange={e => setInvitationForm(p => ({ ...p, eventName: e.target.value }))} />
-            </Grid>
-            <Grid size={{ xs: 12, md: 3 }}>
-              <TextField fullWidth type="date" label="Date" InputLabelProps={{ shrink: true }}
-                value={invitationForm.date}
-                onChange={e => setInvitationForm(p => ({ ...p, date: e.target.value }))} />
-            </Grid>
-            <Grid size={{ xs: 12, md: 3 }}>
-              <TextField fullWidth type="time" label="Time" InputLabelProps={{ shrink: true }}
-                value={invitationForm.time}
-                onChange={e => setInvitationForm(p => ({ ...p, time: e.target.value }))} />
-            </Grid>
             <Grid size={{ xs: 12 }}>
-              <TextField fullWidth label="Venue" value={invitationForm.venue}
-                onChange={e => setInvitationForm(p => ({ ...p, venue: e.target.value }))} />
-            </Grid>
-            <Grid size={{ xs: 12 }}>
-              <TextField fullWidth label="Message / Caption" multiline minRows={2}
+              <TextField fullWidth label="Message / Caption" multiline minRows={3}
                 value={invitationForm.message}
                 onChange={e => setInvitationForm(p => ({ ...p, message: e.target.value }))}
-                helperText="Custom text sent with the image. Overrides the auto-generated event caption." />
+                helperText="Text sent with the image (or on its own if no image is uploaded)." />
             </Grid>
             <Grid size={{ xs: 12 }}>
               <FormControlLabel
                 control={<Switch checked={!!invitationForm.includeRsvp} onChange={e => setInvitationForm(p => ({ ...p, includeRsvp: e.target.checked }))} color="success" />}
-                label={<Typography variant="body2" fontWeight={600}>Include RSVP Buttons (Yes / No)</Typography>}
+                label={<Typography variant="body2" fontWeight={600}>Include RSVP Poll (recipients tap to vote)</Typography>}
               />
             </Grid>
             {invitationForm.includeRsvp && (
               <>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField fullWidth size="small" label="Yes Button Label" value={invitationForm.rsvpYesLabel}
+                  <TextField fullWidth size="small" label="Yes Option" value={invitationForm.rsvpYesLabel}
                     onChange={e => setInvitationForm(p => ({ ...p, rsvpYesLabel: e.target.value }))} />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
-                  <TextField fullWidth size="small" label="No Button Label" value={invitationForm.rsvpNoLabel}
+                  <TextField fullWidth size="small" label="No Option" value={invitationForm.rsvpNoLabel}
                     onChange={e => setInvitationForm(p => ({ ...p, rsvpNoLabel: e.target.value }))} />
                 </Grid>
               </>
@@ -1124,7 +1106,7 @@ function InvitationPanel({
               variant="contained" color={accentColor}
               size="large"
               startIcon={<SendIcon />}
-              disabled={totalCount === 0 || !invitationForm.imageUrl}
+              disabled={totalCount === 0 || (!invitationForm.imageUrl && !invitationForm.message.trim())}
               onClick={startQueue}>
               Start Sending {totalCount > 0 ? `(${Math.min(totalCount, MAX_RECIPIENTS)})` : ''}
             </Button>

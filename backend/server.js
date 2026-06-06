@@ -35,9 +35,10 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
+  'https://bulk-invite-frontend.vercel.app',
+  'https://bulk.instify.in',
   'https://bkfrontend.vercel.app',
   'https://bkawards.instify.in',
-  // Add your Vercel frontend URL via env var
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : []),
 ];
 

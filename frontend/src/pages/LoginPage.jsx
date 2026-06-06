@@ -42,7 +42,7 @@ export default function LoginPage() {
                 <Box sx={{ width: 56, height: 56, borderRadius: 99, display: 'grid', placeItems: 'center', bgcolor: 'primary.main', color: 'white' }}>
                   <LockOutlinedIcon />
                 </Box>
-                <Typography variant="h5" fontWeight={600}>Bulk Invite</Typography>
+                <Typography variant="h5" fontWeight={600}>Instify Bulk Invite</Typography>
                 <Typography color="text.secondary" align="center" variant="body2">
                   Sign in with your mobile number or username
                 </Typography>

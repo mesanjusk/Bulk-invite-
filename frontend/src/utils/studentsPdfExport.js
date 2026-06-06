@@ -12,7 +12,7 @@ export function exportStudentsToPDF(students) {
   // Title
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.text('BK Awards 2026 — Student Records', margin, 16);
+  doc.text('Instify Bulk Invite — Student Records', margin, 16);
 
   // Subtitle / stats
   doc.setFontSize(9);

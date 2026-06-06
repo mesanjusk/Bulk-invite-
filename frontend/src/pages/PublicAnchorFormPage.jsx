@@ -65,7 +65,7 @@ function HeroCard({ editMode }) {
         variant="body2"
         sx={{ mt: 1, opacity: 0.95, fontSize: { xs: '0.82rem', sm: '0.92rem', md: '1rem' } }}
       >
-        {editMode ? 'Update your anchor details' : '— Scholar Awards 2026'}
+        {editMode ? 'Update your anchor details' : '— Bulk Invites 2026'}
       </Typography>
     </Box>
   );
@@ -75,12 +75,12 @@ function ConfirmationCard({ anchorName, mobile, age, language, editToken, onBack
   const languageDisplay = Array.isArray(language) ? language.join(', ') : language || '';
 
   const shareMessage = encodeURIComponent(
-    `✅ *My BK Scholar Awards 2026 - Anchor Registration*\n\n` +
+    `✅ *My BK Bulk Invites 2026 - Anchor Registration*\n\n` +
     `*Name:* ${anchorName}\n` +
     `*Age:* ${age}\n` +
     `*Language(s):* ${languageDisplay}\n` +
     `*Mobile:* ${mobile}\n\n` +
-    `I have successfully registered as an Anchor for BK Scholar Awards 2026.\n` +
+    `I have successfully registered as an Anchor for BK Bulk Invites 2026.\n` +
     `Please confirm my registration. 🙏`
   );
   const waShareLink = `https://wa.me/${ORG_WHATSAPP}?text=${shareMessage}`;
@@ -113,7 +113,7 @@ function ConfirmationCard({ anchorName, mobile, age, language, editToken, onBack
               Registration Confirmed!
             </Typography>
             <Typography variant="body2" sx={{ color: '#ede9fe' }}>
-              BK Scholar Awards 2026 — Anchor
+              BK Bulk Invites 2026 — Anchor
             </Typography>
           </Box>
 
@@ -371,7 +371,7 @@ export default function PublicAnchorFormPage() {
                   color: '#111827'
                 }}
               >
-                Badte Kadam Scholar Awards 2026. Anchor Audition.
+                Instify Bulk Invite. Anchor Audition.
               </Alert>
             ) : null}
 

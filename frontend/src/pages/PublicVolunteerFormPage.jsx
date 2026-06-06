@@ -21,7 +21,7 @@ import { uploadPublicFile } from '../services/uploadService';
 import { buildFinalCanvas, downloadPhoto } from '../utils/photoTemplate';
 import { loadTemplateConfig, TEMPLATE_DEFAULTS } from './TemplateConfigPage';
 
-const DEFAULT_TEMPLATE_SRC = '/badhte-kadam-2026.jpg';
+const DEFAULT_TEMPLATE_SRC = '/photo-template.jpg';
 
 const inputSx = {
   '& .MuiFilledInput-root': {
@@ -154,7 +154,7 @@ export default function PublicVolunteerFormPage() {
         }}
       >
         <Groups sx={{ fontSize: 40, mb: 1 }} />
-        <Typography variant="h5" fontWeight={800}>Badte Kadam Scholar Awards</Typography>
+        <Typography variant="h5" fontWeight={800}>Instify Bulk Invites</Typography>
         <Typography variant="body2" sx={{ mt: 1, opacity: 0.95 }}>Sunday 14 June 2026</Typography>
       </Box>
 

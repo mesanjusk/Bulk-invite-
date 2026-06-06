@@ -31,7 +31,7 @@ const DEF_CX     = TEMPLATE_DEFAULTS.cx;
 const DEF_CY     = TEMPLATE_DEFAULTS.cy;
 const DEF_R      = TEMPLATE_DEFAULTS.r;
 const DEF_TEXT_Y = TEMPLATE_DEFAULTS.textY;
-const DEFAULT_TEMPLATE_SRC = '/badhte-kadam-2026.jpg';
+const DEFAULT_TEMPLATE_SRC = '/photo-template.jpg';
 
 function clamp(min, val, max) { return Math.min(max, Math.max(min, val)); }
 
@@ -259,7 +259,7 @@ export default function PublicPhotoTemplatePage() {
             userSelect: 'none',
           }}
         >
-          <img src={templateSrc} alt="BK Awards template" onLoad={handleTemplateLoad}
+          <img src={templateSrc} alt="Instify Bulk Invite template" onLoad={handleTemplateLoad}
             style={{ display: 'block', width: '100%', height: 'auto' }} draggable={false} />
 
           {/* Circle overlay — all positioning uses margin-top (width-relative) not top (height-relative), so Safari renders identically to Chrome */}

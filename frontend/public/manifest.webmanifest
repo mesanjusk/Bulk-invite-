@@ -1,13 +1,13 @@
 {
   "id": "/?source=pwa",
-  "name": "BK Scholar Awards 2026",
-  "short_name": "BK Awards",
-  "description": "Mobile-first event operations, student registration, and live coordination for BK Scholar Awards 2026.",
+  "name": "Instify Bulk Invite",
+  "short_name": "Bulk Invite",
+  "description": "Send personalised WhatsApp invitations at scale with Instify Bulk Invite.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f6fbff",
-  "theme_color": "#2497d3",
+  "background_color": "#F1F5F9",
+  "theme_color": "#2563EB",
   "orientation": "portrait",
   "icons": [
     {

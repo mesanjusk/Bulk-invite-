@@ -74,7 +74,7 @@ function HeroCard({ editMode }) {
         BADTE KADAM
       </Typography>
       <Typography variant="body2" sx={{ mt: 1, opacity: 0.95, fontSize: { xs: '0.82rem', sm: '0.92rem', md: '1rem' } }}>
-        {editMode ? 'Update your submitted details' : 'Scholar Awards 2026'}
+        {editMode ? 'Update your submitted details' : 'Bulk Invites 2026'}
       </Typography>
     </Box>
   );
@@ -142,12 +142,12 @@ function ConfirmationCard({ studentName, studentId, editToken, categoryName, mob
 
   // WhatsApp share message — opens on student's own WhatsApp to the org number
   const shareMessage = encodeURIComponent(
-    `✅ *My BK Scholar Awards 2026 Registration*\n\n` +
+    `✅ *My BK Bulk Invites 2026 Registration*\n\n` +
     `*Name:* ${studentName}\n` +
-    `*Selected Category:* ${categoryName || 'Scholar Award'}\n` +
+    `*Selected Category:* ${categoryName || 'Bulk Invite'}\n` +
     (percentageDisplay ? `*Percentage:* ${percentageDisplay}\n` : '') +
     `*Mobile:* ${mobile}\n\n` +
-    `I have successfully registered for BK Scholar Awards 2026.\n` +
+    `I have successfully registered for BK Bulk Invites 2026.\n` +
     `Please confirm my registration. 🙏`
   );
   const waShareLink = `https://wa.me/${ORG_WHATSAPP}?text=${shareMessage}`;
@@ -181,7 +181,7 @@ function ConfirmationCard({ studentName, studentId, editToken, categoryName, mob
               Registration Confirmed!
             </Typography>
             <Typography variant="body2" sx={{ color: '#e6fff0' }}>
-              BK Scholar Awards 2026
+              BK Bulk Invites 2026
             </Typography>
           </Box>
 

@@ -2,7 +2,7 @@ import { Box, Container, Paper, Typography, Stack } from '@mui/material';
 import { Lock, EventBusy } from '@mui/icons-material';
 
 export default function RegistrationClosedPage({
-  title = 'BK Awards – Registration',
+  title = 'Instify – Registration',
   color = '#7c3aed',
 }) {
   const lightBg = `${color}14`; // ~8% opacity tint
@@ -52,7 +52,7 @@ export default function RegistrationClosedPage({
           {/* Footer */}
           <Box sx={{ bgcolor: `${color}0d`, py: 2, px: 4 }}>
             <Typography variant="caption" color="text.disabled">
-              BK Awards &copy; {new Date().getFullYear()}
+              Instify &copy; {new Date().getFullYear()}
             </Typography>
           </Box>
         </Paper>

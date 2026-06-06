@@ -151,7 +151,7 @@ export default function TemplateConfigPage() {
     setSaved(false);
   };
 
-  const templateSrc = config.templateSrc || '/badhte-kadam-2026.jpg';
+  const templateSrc = config.templateSrc || '/photo-template.jpg';
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>

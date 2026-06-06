@@ -1,115 +1,116 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Box, Button, Card, CardContent, Grid, List, ListItem, ListItemText, Stack, Typography } from '@mui/material';
-import { Mic, OpenInNew, School } from '@mui/icons-material';
-import api from '../api';
-import { useAuth } from '../context/AuthContext';
-import { useLive } from '../context/LiveContext';
-import PageHeader from '../components/PageHeader';
-import PageSurface from '../components/PageSurface';
-import StatCard from '../components/StatCard';
+import {
+  Box, Button, Card, CardContent, Grid, List, ListItem,
+  ListItemText, Stack, Typography,
+} from '@mui/material';
+import PeopleIcon       from '@mui/icons-material/People';
+import ChatIcon         from '@mui/icons-material/Chat';
+import CategoryIcon     from '@mui/icons-material/Category';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import SendIcon         from '@mui/icons-material/Send';
+import OpenInNewIcon    from '@mui/icons-material/OpenInNew';
+import api              from '../api';
+import { useAuth }      from '../context/AuthContext';
+import { useLive }      from '../context/LiveContext';
+import PageHeader       from '../components/PageHeader';
+import PageSurface      from '../components/PageSurface';
+import StatCard         from '../components/StatCard';
 
 export default function DashboardPage() {
-  const { user } = useAuth();
+  const { user }              = useAuth();
   const { events, connected } = useLive();
   const [summary, setSummary] = useState({});
 
   useEffect(() => {
-    api.get('/dashboard/summary').then((r) => setSummary(r.data)).catch(() => setSummary({}));
+    api.get('/dashboard/summary').then((r) => setSummary(r.data)).catch(() => {});
   }, []);
 
   const cards = useMemo(() => [
-    ['Students', summary.students || 0, 'Registered'],
-    ['Anchors', summary.anchors || 0, 'Registered'],
-    ['Eligible', summary.eligibleStudents || 0, 'Ready for review'],
-    ['WhatsApp', summary.whatsappMessages || 0, connected ? 'Live sync active' : 'Waiting for sync'],
-    ['Events', summary.events || 0, 'Configured'],
+    ['Users',         summary.users            || 0, 'Active accounts',         <PeopleIcon />],
+    ['WhatsApp Msgs', summary.whatsappMessages  || 0, connected ? 'Live' : 'Syncing', <ChatIcon />],
+    ['Events',        summary.events            || 0, 'Configured events',       <CategoryIcon />],
+    ['Notifications', summary.notifications     || 0, 'Unread',                  <NotificationsIcon />],
   ], [summary, connected]);
 
   return (
     <Box sx={{ pb: 4 }}>
       <PageHeader
         eyebrow="Overview"
-        title="Operations Dashboard"
-        subtitle="A cleaner WhatsApp-style workspace for daily student, event and inbox management."
+        title="Dashboard"
+        subtitle="Manage your bulk invite campaigns and WhatsApp communications."
         chips={[
-          { label: user?.roleId?.name || 'Dashboard' },
-          { label: `${events.length} Live updates`, color: connected ? 'success' : 'warning' },
+          { label: user?.roleId?.name || 'User' },
+          { label: connected ? 'Connected' : 'Connecting...', color: connected ? 'success' : 'warning' },
         ]}
       />
 
-      <PageSurface sx={{ mb: 2 }}>
+      {/* Stat cards */}
+      <PageSurface sx={{ mb: 2.5 }}>
         <Grid container spacing={2}>
           {cards.map(([title, value, subtitle]) => (
-            <Grid key={title} size={{ xs: 6, sm: 4, lg: 'grow' }}>
+            <Grid key={title} size={{ xs: 6, sm: 3 }}>
               <StatCard title={title} value={value} subtitle={subtitle} />
             </Grid>
           ))}
         </Grid>
       </PageSurface>
 
-      <PageSurface sx={{ mb: 2 }}>
+      {/* Quick actions */}
+      <PageSurface sx={{ mb: 2.5 }}>
         <Card>
           <CardContent>
-            <Typography variant="h6" fontWeight={800} sx={{ mb: 1.5 }}>
-              Registration Links
-            </Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+            <Typography variant="h6" fontWeight={700} sx={{ mb: 2 }}>Quick Actions</Typography>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} flexWrap="wrap" useFlexGap>
               <Button
                 variant="contained"
-                startIcon={<School />}
-                endIcon={<OpenInNew fontSize="small" />}
-                href="/student-register"
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={{
-                  textTransform: 'none',
-                  fontWeight: 700,
-                  borderRadius: 2,
-                  bgcolor: '#2497d3',
-                  '&:hover': { bgcolor: '#1e88c0' }
-                }}
+                startIcon={<SendIcon />}
+                href="/whatsapp"
+                sx={{ bgcolor: '#2563EB' }}
               >
-                Student Registration
+                Send Bulk Invites
               </Button>
               <Button
-                variant="contained"
-                startIcon={<Mic />}
-                endIcon={<OpenInNew fontSize="small" />}
-                href="/anchor-register"
+                variant="outlined"
+                startIcon={<PeopleIcon />}
+                href="/admin"
+              >
+                Manage Users
+              </Button>
+              <Button
+                variant="outlined"
+                startIcon={<OpenInNewIcon />}
+                href="/public-invite"
                 target="_blank"
                 rel="noopener noreferrer"
-                sx={{
-                  textTransform: 'none',
-                  fontWeight: 700,
-                  borderRadius: 2,
-                  bgcolor: '#7c3aed',
-                  '&:hover': { bgcolor: '#6d28d9' }
-                }}
               >
-                Anchor Registration
+                Public Invite Link
               </Button>
             </Stack>
           </CardContent>
         </Card>
       </PageSurface>
 
+      {/* Live activity */}
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, lg: 7 }}>
           <PageSurface>
             <Card>
               <CardContent>
-                <Typography variant="h6" fontWeight={800} sx={{ mb: 1.5 }}>Live activity</Typography>
+                <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5 }}>Live Activity</Typography>
                 <List sx={{ py: 0 }}>
                   {events.length ? events.slice(0, 8).map((ev, idx) => (
                     <ListItem key={idx} divider sx={{ px: 0 }}>
                       <ListItemText
                         primary={ev.name.replace(/_/g, ' ')}
-                        primaryTypographyProps={{ fontWeight: 700, variant: 'body2' }}
-                        secondary={JSON.stringify(ev.payload).slice(0, 92) + '...'}
+                        primaryTypographyProps={{ fontWeight: 600, variant: 'body2' }}
+                        secondary={JSON.stringify(ev.payload).slice(0, 90) + '…'}
+                        secondaryTypographyProps={{ variant: 'caption' }}
                       />
                     </ListItem>
                   )) : (
-                    <Typography color="text.secondary" variant="body2">Waiting for live events...</Typography>
+                    <Typography color="text.secondary" variant="body2">
+                      No live events yet — they will appear here in real time.
+                    </Typography>
                   )}
                 </List>
               </CardContent>
@@ -121,9 +122,19 @@ export default function DashboardPage() {
             <Card>
               <CardContent>
                 <Stack spacing={1.5}>
-                  <Typography variant="h6" fontWeight={800}>Quick notes</Typography>
-                  <Typography variant="body2" color="text.secondary">Use Students for registration review, WhatsApp for customer reply handling, and Admin for users, guests and teams.</Typography>
-                  <Typography variant="body2" color="text.secondary">The UI is now aligned to a WhatsApp-style management dashboard across mobile and desktop.</Typography>
+                  <Typography variant="h6" fontWeight={700}>Getting Started</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    1. Go to <strong>Admin</strong> to create users and assign roles.
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    2. Connect your WhatsApp via <strong>System Settings → Baileys</strong> by scanning the QR code.
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    3. Use <strong>WhatsApp</strong> to compose and send bulk invitations to your contact list.
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    4. Monitor replies and manage conversations in the WhatsApp inbox.
+                  </Typography>
                 </Stack>
               </CardContent>
             </Card>

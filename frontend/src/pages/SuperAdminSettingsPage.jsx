@@ -253,7 +253,7 @@ function RegistrationGroupsSection({ map, saving, save }) {
                   <Divider />
                   <GroupRow
                     icon={<GroupsIcon sx={{ color: '#16a34a', fontSize: 18 }} />}
-                    label="BK Award 2026 Volunteer Group"
+                    label="Bulk Invite Volunteer Group"
                     color="#16a34a"
                     value={volunteerJid}
                     onChange={setVolunteerJid}

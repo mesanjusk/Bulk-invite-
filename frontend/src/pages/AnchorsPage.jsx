@@ -115,7 +115,7 @@ export default function AnchorsPage() {
       <PageHeader
         eyebrow="Report"
         title="Anchors"
-        subtitle="All registered anchors for Badte Kadam Scholar Awards 2026."
+        subtitle="All registered anchors for Instify Bulk Invite."
         chips={[
           { label: `${anchors.length} Registered` },
           { label: `${filtered.length} Shown` }

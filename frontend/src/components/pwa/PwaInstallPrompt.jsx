@@ -30,7 +30,7 @@ export default function PwaInstallPrompt() {
           </>
         }
       >
-        Install BK Scholar Awards 2026 for a faster mobile app experience.
+        Install Instify Bulk Invite for a faster mobile experience.
       </Alert>
     </Collapse>
   );

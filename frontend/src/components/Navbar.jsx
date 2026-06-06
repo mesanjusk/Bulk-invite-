@@ -17,7 +17,7 @@ export default function Navbar() {
 
   return (
     <div className="nav">
-      <div className="nav-title">Scholar Awards PWA</div>
+      <div className="nav-title">Bulk Invites PWA</div>
       <div className="nav-links">
         {baseLinks.map((item) => <Link key={item.to} to={item.to}>{item.label}</Link>)}
         {user?.roleId?.code === 'SUPER_ADMIN' ? <Link to="/admin">Admin</Link> : null}

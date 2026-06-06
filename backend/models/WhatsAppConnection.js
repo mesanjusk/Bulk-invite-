@@ -7,7 +7,7 @@ const schema = new mongoose.Schema({
   businessAccountId: { type: String, default: '' },
   wabaId: { type: String, default: '' },
   accessTokenMasked: { type: String, default: '' },
-  isActive: { type: Boolean, default: true }
+  isActive: { type: Boolean, default: true },
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 

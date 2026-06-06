@@ -6,7 +6,7 @@ const automationRuleSchema = new mongoose.Schema({
   conditionText: { type: String, default: '' },
   templateName: { type: String, default: '' },
   recipientType: { type: String, default: '' },
-  isActive: { type: Boolean, default: true }
+  isActive: { type: Boolean, default: true },
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 

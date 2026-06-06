@@ -9,7 +9,7 @@ const budgetHeadSchema = new mongoose.Schema({
   notes: { type: String, default: '' },
   responsibleTeamId: { type: mongoose.Schema.Types.ObjectId, ref: 'Team', default: null },
   responsibleUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
-  isActive: { type: Boolean, default: true }
+  isActive: { type: Boolean, default: true },
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 

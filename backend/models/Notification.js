@@ -8,7 +8,7 @@ const notificationSchema = new mongoose.Schema({
   targetUserIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   relatedModel: { type: String, default: '' },
-  relatedId: { type: String, default: '' }
+  relatedId: { type: String, default: '' },
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 

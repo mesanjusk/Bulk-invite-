@@ -10,7 +10,7 @@ const eventTaskSchema = new mongoose.Schema({
   status: { type: String, enum: ['PENDING','IN_PROGRESS','DONE'], default: 'PENDING' },
   startTimeLabel: { type: String, default: '' },
   deadlineLabel: { type: String, default: '' },
-  notes: { type: String, default: '' }
+  notes: { type: String, default: '' },
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 

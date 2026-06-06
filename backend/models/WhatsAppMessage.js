@@ -16,7 +16,7 @@ const schema = new mongoose.Schema({
   isAutoReply: { type: Boolean, default: false },
   relatedEntityType: { type: String, default: '' },
   relatedEntityId: { type: String, default: '' },
-  meta: { type: mongoose.Schema.Types.Mixed, default: {} }
+  meta: { type: mongoose.Schema.Types.Mixed, default: {} },
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 schema.index({ conversationKey: 1, createdAt: -1 });

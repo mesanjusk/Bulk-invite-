@@ -15,7 +15,7 @@ const vendorSchema = new mongoose.Schema({
   advancePaid: { type: Number, default: 0 },
   dueAmount: { type: Number, default: 0 },
   paymentStatus: { type: String, enum: ['UNPAID','PARTIAL','PAID'], default: 'UNPAID' },
-  notes: { type: String, default: '' }
+  notes: { type: String, default: '' },
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 

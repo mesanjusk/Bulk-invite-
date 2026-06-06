@@ -13,7 +13,7 @@ const schema = new mongoose.Schema({
   bodyText: { type: String, default: '' },
   mediaUrl: { type: String, default: '' },
   status: { type: String, enum: ['PENDING', 'QUEUED', 'SENT', 'DELIVERED', 'READ', 'FAILED', 'RECEIVED'], default: 'SENT', index: true },
-  meta: { type: mongoose.Schema.Types.Mixed, default: {} }
+  meta: { type: mongoose.Schema.Types.Mixed, default: {} },
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 

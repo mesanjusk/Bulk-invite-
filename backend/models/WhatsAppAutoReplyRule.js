@@ -9,7 +9,7 @@ const schema = new mongoose.Schema({
   templateLanguage: { type: String, default: 'en_US' },
   isActive: { type: Boolean, default: true },
   priority: { type: Number, default: 100 },
-  stopAfterMatch: { type: Boolean, default: true }
+  stopAfterMatch: { type: Boolean, default: true },
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 schema.index({ isActive: 1, priority: 1, createdAt: -1 });

@@ -16,7 +16,7 @@ const stageAssignmentSchema = new mongoose.Schema({
     default: 'PENDING'
   },
   changeReason: { type: String, default: '' },
-  calledByAnchor: { type: Boolean, default: false }
+  calledByAnchor: { type: Boolean, default: false },
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', default: null },
 }, { timestamps: true });
 

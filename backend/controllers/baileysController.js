@@ -179,7 +179,10 @@ async function sendInvitation(req, res) {
       if (imageUrl) {
         await baileysService.sendImage({ to: phone, imageUrl, caption });
       } else {
-        await baileysService.sendText({ to: phone, body: caption });
+        // Format text-only invitations with a personal greeting so they stand out
+        const name = (recipient.name || '').trim();
+        const body = name ? `📩 *Dear ${name},*\n\n${caption}` : `📩 *Invitation*\n\n${caption}`;
+        await baileysService.sendText({ to: phone, body });
       }
 
       await BaileysMessage.create({
@@ -196,7 +199,10 @@ async function sendInvitation(req, res) {
       });
 
       if (includeRsvp) {
-        const pollQuestion = caption ? `${caption.slice(0, 60)}${caption.length > 60 ? '…' : ''}` : 'Are you attending? 🎉';
+        const name = (recipient.name || '').trim();
+        const pollQuestion = name
+          ? `Will you be attending, ${name}? 🎉`
+          : 'Will you be attending? 🎉';
         try {
           await baileysService.sendButtonMessage({
             to: phone,

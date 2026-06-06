@@ -237,13 +237,40 @@ async function sendButtonMessage({ to, text, footer = '', buttons = [] }) {
   const pollValues = buttons.map(b => String(b.label || '').slice(0, 100)).filter(Boolean);
   if (!pollValues.length) throw new Error('Poll requires at least one option');
 
-  // WhatsApp native poll — recipients tap to vote, sender sees results
-  return baileysSocket.sendMessage(formatJid(to), {
-    poll: {
-      name: pollName,
-      values: pollValues,
-      selectableCount: 1,
-    },
+  const jid = formatJid(to);
+
+  // 1️⃣ Try native WhatsApp poll (modern clients — tap to vote)
+  try {
+    return await baileysSocket.sendMessage(jid, {
+      poll: { name: pollName, values: pollValues, selectableCount: 1 },
+    });
+  } catch (_) {}
+
+  // 2️⃣ Fall back to list message (button that opens option list)
+  try {
+    return await baileysSocket.sendMessage(jid, {
+      listMessage: {
+        title:      pollName,
+        text:       pollName,
+        footerText: '',
+        buttonText: '🗳️ Respond',
+        listType:   1,
+        sections: [{
+          title: 'Your Response',
+          rows:  pollValues.map((label, i) => ({
+            title:       label,
+            rowId:       `rsvp_${i}`,
+            description: '',
+          })),
+        }],
+      },
+    });
+  } catch (_) {}
+
+  // 3️⃣ Last resort — numbered plain-text choices
+  const numbered = pollValues.map((v, i) => `${i + 1}. ${v}`).join('\n');
+  return baileysSocket.sendMessage(jid, {
+    text: `🗳️ *${pollName}*\n\n${numbered}\n\n_Reply with your choice number._`,
   });
 }
 

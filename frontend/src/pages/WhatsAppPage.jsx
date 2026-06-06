@@ -51,7 +51,7 @@ const emptyInvitationForm = {
   recipientMode: 'single', singleName: '', singleNumber: '',
   imageUrl: '',
   message: '',
-  includeRsvp: false, rsvpYesLabel: 'Yes, I\'ll attend ✅', rsvpNoLabel: 'Sorry, can\'t make it ❌',
+  includeRsvp: true, rsvpYesLabel: 'Yes, I\'ll attend ✅', rsvpNoLabel: 'Sorry, can\'t make it ❌',
 };
 
 // Default font style

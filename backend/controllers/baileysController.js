@@ -176,13 +176,21 @@ async function sendInvitation(req, res) {
     const msgType = imageUrl ? 'IMAGE' : 'TEXT';
 
     try {
+      const recipientName = (recipient.name || '').trim();
+
+      // Build the RSVP suffix that gets embedded directly in the message body
+      const rsvpSuffix = includeRsvp
+        ? `\n\n*Please RSVP:*\n1️⃣ ${rsvpYesLabel}\n2️⃣ ${rsvpNoLabel}`
+        : '';
+
       if (imageUrl) {
-        await baileysService.sendImage({ to: phone, imageUrl, caption });
+        const fullCaption = caption + rsvpSuffix;
+        await baileysService.sendImage({ to: phone, imageUrl, caption: fullCaption });
       } else {
-        // Format text-only invitations with a personal greeting so they stand out
-        const name = (recipient.name || '').trim();
-        const body = name ? `📩 *Dear ${name},*\n\n${caption}` : `📩 *Invitation*\n\n${caption}`;
-        await baileysService.sendText({ to: phone, body });
+        const greeting = recipientName
+          ? `📩 *Dear ${recipientName},*\n\n${caption}`
+          : `📩 *Invitation*\n\n${caption}`;
+        await baileysService.sendText({ to: phone, body: greeting + rsvpSuffix });
       }
 
       await BaileysMessage.create({
@@ -193,41 +201,33 @@ async function sendInvitation(req, res) {
         direction: 'OUTGOING',
         source: 'INVITATION',
         messageType: msgType,
-        bodyText: caption,
+        bodyText: caption + rsvpSuffix,
         status: 'SENT',
-        meta: { imageUrl, textPosition },
+        meta: { imageUrl, textPosition, includeRsvp },
       });
 
+      // Also attempt a native interactive poll as a bonus second message
       if (includeRsvp) {
-        const name = (recipient.name || '').trim();
-        const pollQuestion = name
-          ? `Will you be attending, ${name}? 🎉`
+        const pollQuestion = recipientName
+          ? `Will you be attending, ${recipientName}? 🎉`
           : 'Will you be attending? 🎉';
-        try {
-          await baileysService.sendButtonMessage({
-            to: phone,
-            text: pollQuestion,
-            footer: '',
-            buttons: [
-              { id: 'rsvp_yes', label: rsvpYesLabel },
-              { id: 'rsvp_no',  label: rsvpNoLabel  },
-            ],
-          });
-          await BaileysMessage.create({
-            to: phone,
-            from: '',
-            contactName: recipient.name || '',
+        baileysService.sendButtonMessage({
+          to: phone,
+          text: pollQuestion,
+          footer: '',
+          buttons: [
+            { id: 'rsvp_yes', label: rsvpYesLabel },
+            { id: 'rsvp_no',  label: rsvpNoLabel  },
+          ],
+        }).then(() =>
+          BaileysMessage.create({
+            to: phone, from: '', contactName: recipient.name || '',
             conversationKey: getConversationKey(phone),
-            direction: 'OUTGOING',
-            source: 'INVITATION',
-            messageType: 'INTERACTIVE',
-            bodyText: `RSVP: ${rsvpYesLabel} / ${rsvpNoLabel}`,
-            status: 'SENT',
+            direction: 'OUTGOING', source: 'INVITATION', messageType: 'INTERACTIVE',
+            bodyText: `📊 Poll: ${rsvpYesLabel} / ${rsvpNoLabel}`, status: 'SENT',
             meta: { rsvp: true, rsvpYesLabel, rsvpNoLabel },
-          });
-        } catch (rsvpErr) {
-          console.warn('[baileys] RSVP poll send failed for', phone, rsvpErr.message);
-        }
+          }).catch(() => null)
+        ).catch(err => console.warn('[baileys] native poll skipped:', err.message));
       }
 
       success++;

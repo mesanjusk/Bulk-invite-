@@ -34,6 +34,12 @@ const whatsappService = {
     : api.post('/baileys/rules', payload),
 
   baileysGetLogs:      ()           => api.get('/baileys/logs'),
+
+  // ── Blast campaigns ───────────────────────────────────────────────────────
+  getBlasts:           ()           => api.get('/blasts'),
+  getBlast:            (id)         => api.get(`/blasts/${id}`),
+  createBlast:         (payload)    => api.post('/blasts', payload),
+  updateBlast:         (id, payload)=> api.patch(`/blasts/${id}`, payload),
 };
 
 export default whatsappService;

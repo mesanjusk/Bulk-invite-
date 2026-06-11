@@ -787,37 +787,40 @@ function InvitationPanel({
         }
         if (cancelRef.current) break;
 
-        setQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: 'sending' } : item));
-        setQueueIdx(i);
+        // Capture i as a constant so closures below are not affected by i++
+        const currentIdx = i;
+
+        setQueue(prev => prev.map((item, idx) => idx === currentIdx ? { ...item, status: 'sending' } : item));
+        setQueueIdx(currentIdx);
 
         let sendStatus = 'FAILED';
         let sendError  = '';
         try {
-          const personalisedUrl = await buildPersonalisedImageUrl(recipients[i].name);
+          const personalisedUrl = await buildPersonalisedImageUrl(recipients[currentIdx].name);
           // Replace {name} placeholder in message text
           const personalisedMsg = (invFormRef.current.message || '')
-            .replace(/\{name\}/gi, recipients[i].name || 'Guest');
+            .replace(/\{name\}/gi, recipients[currentIdx].name || 'Guest');
 
           await sendServiceFn({
             ...invFormRef.current,
             message:      personalisedMsg,
             imageUrl:     personalisedUrl,
-            recipients:   [{ name: recipients[i].name, mobile: recipients[i].mobile, source: recipients[i].source }],
+            recipients:   [{ name: recipients[currentIdx].name, mobile: recipients[currentIdx].mobile, source: recipients[currentIdx].source }],
             textPosition: fontStyleRef.current,
           });
-          setQueue(prev => prev.map((item, idx) => idx === i ? { ...item, status: 'delivered' } : item));
+          setQueue(prev => prev.map((item, idx) => idx === currentIdx ? { ...item, status: 'delivered' } : item));
           sendTimestamps.current.push(Date.now());
           sendStatus = 'SENT';
         } catch (err) {
           sendError = err?.response?.data?.message || err.message || 'Failed';
           setQueue(prev => prev.map((item, idx) =>
-            idx === i ? { ...item, status: 'failed', error: sendError } : item));
+            idx === currentIdx ? { ...item, status: 'failed', error: sendError } : item));
         }
 
         blastResultsRef.current.push({
-          name:   recipients[i].name,
-          mobile: recipients[i].mobile,
-          source: recipients[i].source || 'CUSTOM',
+          name:   recipients[currentIdx].name,
+          mobile: recipients[currentIdx].mobile,
+          source: recipients[currentIdx].source || 'CUSTOM',
           status: sendStatus,
           error:  sendError,
           sentAt: new Date().toISOString(),

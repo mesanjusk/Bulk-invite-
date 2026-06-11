@@ -5,7 +5,8 @@ const { emitEvent }  = require('../services/socket');
 const baileysService = require('../services/baileysService');
 
 function normalizePhone(value) {
-  return String(value || '').replace(/[^\d]/g, '').trim();
+  const d = String(value || '').replace(/[^\d]/g, '').trim();
+  return d.length === 10 ? '91' + d : d;
 }
 function getConversationKey(phone) {
   return normalizePhone(phone);
@@ -180,7 +181,7 @@ async function sendInvitation(req, res) {
 
       // Build the RSVP suffix that gets embedded directly in the message body
       const rsvpSuffix = includeRsvp
-        ? `\n\n*Please RSVP:*\n1️⃣ ${rsvpYesLabel}\n2️⃣ ${rsvpNoLabel}`
+        ? `\n\nPlease confirm your attendance:\n\n✅ Reply *${rsvpYesLabel}*\n❌ Reply *${rsvpNoLabel}*`
         : '';
 
       if (imageUrl) {

@@ -71,12 +71,23 @@ async function requestSignupOtp(req, res) {
     }
 
     const result = await sendOtp(clean, 'SIGNUP');
-    return res.json({
-      message: result.sent
-        ? 'OTP sent to your WhatsApp number'
-        : 'OTP generated (WhatsApp not connected — check devOtp in non-production)',
-      ...(result.devOtp ? { devOtp: result.devOtp } : {}),
-    });
+
+    if (!result.sent) {
+      // In dev mode — let tester proceed with the devOtp shown on screen
+      if (result.devOtp) {
+        return res.json({
+          message: `WhatsApp send failed: ${result.error || 'API error'}. Use dev OTP below to continue testing.`,
+          devOtp: result.devOtp,
+          warning: result.error,
+        });
+      }
+      // In production — show the actual WhatsApp API error on the mobile screen
+      return res.status(500).json({
+        message: `Failed to send OTP via WhatsApp: ${result.error || 'Please check your WhatsApp API configuration.'}`,
+      });
+    }
+
+    return res.json({ message: 'OTP sent to your WhatsApp number' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -157,12 +168,21 @@ async function requestForgotOtp(req, res) {
     }
 
     const result = await sendOtp(clean, 'FORGOT_PASSWORD');
-    return res.json({
-      message: result.sent
-        ? 'OTP sent to your WhatsApp number'
-        : 'OTP generated (WhatsApp not connected)',
-      ...(result.devOtp ? { devOtp: result.devOtp } : {}),
-    });
+
+    if (!result.sent) {
+      if (result.devOtp) {
+        return res.json({
+          message: `WhatsApp send failed: ${result.error || 'API error'}. Use dev OTP below to continue testing.`,
+          devOtp: result.devOtp,
+          warning: result.error,
+        });
+      }
+      return res.status(500).json({
+        message: `Failed to send OTP via WhatsApp: ${result.error || 'Please check your WhatsApp API configuration.'}`,
+      });
+    }
+
+    return res.json({ message: 'OTP sent to your WhatsApp number' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

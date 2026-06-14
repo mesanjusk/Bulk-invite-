@@ -47,4 +47,41 @@ async function verifyOtp(mobile, code, purpose) {
   return { valid: true };
 }
 
-module.exports = { sendOtp, verifyOtp };
+async function sendWelcomeWhatsApp(mobile, name, password) {
+  if (!mobile) return;
+  try {
+    const { sendText } = require('./baileysService');
+    const body = [
+      `🎉 *Welcome to Bulk Invite, ${name}!*`,
+      ``,
+      `Your account has been created successfully.`,
+      ``,
+      `📱 *Mobile / Login:* ${mobile}`,
+      `🔐 *Password:* ${password}`,
+      ``,
+      `Keep your credentials safe. You can change your password anytime from the app.`,
+    ].join('\n');
+    await sendText({ to: mobile, body });
+  } catch (err) {
+    console.error('[OTP] sendWelcomeWhatsApp error:', err.message);
+  }
+}
+
+async function sendPasswordResetConfirmation(mobile, name) {
+  if (!mobile) return;
+  try {
+    const { sendText } = require('./baileysService');
+    const body = [
+      `✅ *Password Reset Successful*`,
+      ``,
+      `Hi ${name}, your Bulk Invite password has been reset successfully.`,
+      ``,
+      `If you did not make this change, please contact your administrator immediately.`,
+    ].join('\n');
+    await sendText({ to: mobile, body });
+  } catch (err) {
+    console.error('[OTP] sendPasswordResetConfirmation error:', err.message);
+  }
+}
+
+module.exports = { sendOtp, verifyOtp, sendWelcomeWhatsApp, sendPasswordResetConfirmation };

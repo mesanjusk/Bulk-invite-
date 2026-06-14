@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const Organization = require('../models/Organization');
 const User = require('../models/User');
 const Role = require('../models/Role');
-const { sendOtp, verifyOtp } = require('../services/otpService');
+const { sendOtp, verifyOtp, sendWelcomeWhatsApp, sendPasswordResetConfirmation } = require('../services/otpService');
 
 function getJwtSecret() {
   return process.env.JWT_SECRET || process.env.ACCESS_TOKEN_SECRET || 'change-me-in-env';
@@ -125,6 +125,10 @@ async function verifySignupOtp(req, res) {
     });
 
     const populated = await User.findById(user._id).populate('roleId');
+
+    // Send welcome WhatsApp (fire-and-forget — don't fail the response if WA is down)
+    sendWelcomeWhatsApp(clean, adminName, password).catch(() => null);
+
     return res.status(201).json({
       token: generateToken(user._id),
       user: populated,
@@ -187,6 +191,10 @@ async function resetPassword(req, res) {
     await user.save();
 
     const populated = await User.findById(user._id).populate('roleId');
+
+    // Send reset confirmation WhatsApp (fire-and-forget)
+    sendPasswordResetConfirmation(clean, user.name).catch(() => null);
+
     return res.json({
       message: 'Password reset successfully. Logging you in.',
       token: generateToken(user._id),

@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Role = require('../models/Role');
+const { sendWelcomeWhatsApp } = require('../services/otpService');
 
 function tenantFilter(req) {
   return req.tenantId ? { tenantId: req.tenantId } : {};
@@ -21,11 +22,19 @@ async function getUsers(req, res) {
 
 async function createUser(req, res) {
   try {
+    const plainPassword = String(req.body.password || '');
     const payload = { ...req.body };
     if (req.tenantId) payload.tenantId = req.tenantId;
 
     const user = await User.create(payload);
     const populated = await User.findById(user._id).populate('roleId');
+
+    // Send welcome WhatsApp if mobile provided (fire-and-forget)
+    const mobile = String(req.body.mobile || '').trim();
+    if (mobile && plainPassword) {
+      sendWelcomeWhatsApp(mobile, String(req.body.name || '').trim(), plainPassword).catch(() => null);
+    }
+
     res.status(201).json(populated);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -79,9 +88,10 @@ async function bulkImportGuests(req, res) {
         const password = String(row.password || '').trim() || 'guest123';
         if (!name || !username) throw new Error('Name and username are required');
 
+        const mobile = String(row.mobile || '').trim();
         const doc = await User.create({
           name, username, password,
-          mobile: String(row.mobile || '').trim(),
+          mobile,
           email: String(row.email || '').trim(),
           roleId: row.roleId || roleId,
           eventDutyType: 'GUEST',
@@ -89,6 +99,8 @@ async function bulkImportGuests(req, res) {
           isActive: row.isActive !== undefined ? Boolean(row.isActive) : true,
         });
         created.push(await User.findById(doc._id).populate('roleId'));
+
+        if (mobile) sendWelcomeWhatsApp(mobile, name, password).catch(() => null);
       } catch (error) {
         errors.push({ row: i + 2, username: row.username || '', message: error.message });
       }
@@ -125,9 +137,10 @@ async function bulkImportVolunteers(req, res) {
         const password = String(row.password || '').trim() || 'volunteer123';
         if (!name || !username) throw new Error('Name and username are required');
 
+        const mobile = String(row.mobile || '').trim();
         const doc = await User.create({
           name, username, password,
-          mobile: String(row.mobile || '').trim(),
+          mobile,
           email: String(row.email || '').trim(),
           roleId: row.roleId || roleId,
           eventDutyType: 'VOLUNTEER',
@@ -135,6 +148,8 @@ async function bulkImportVolunteers(req, res) {
           isActive: row.isActive !== undefined ? Boolean(row.isActive) : true,
         });
         created.push(await User.findById(doc._id).populate('roleId'));
+
+        if (mobile) sendWelcomeWhatsApp(mobile, name, password).catch(() => null);
       } catch (error) {
         errors.push({ row: i + 2, username: row.username || '', message: error.message });
       }
